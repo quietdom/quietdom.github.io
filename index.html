@@ -188,9 +188,33 @@
   .stats b { display: block; font-size: 17px; font-weight: 500; letter-spacing: -0.01em; }
   .stats span { font-size: 11px; color: var(--faint); }
 
-  .grp {
-    font-size: 10.5px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--faint); margin: 26px 0 10px;
+  .picker {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 10px; margin-bottom: 14px;
+  }
+  .game {
+    text-align: left; font-family: inherit; color: var(--text); text-decoration: none;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 11px 14px; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    transition: border-color .25s, background .25s;
+  }
+  .game:hover { border-color: rgba(255,255,255,0.2); }
+  .game.active { border-color: rgba(255,255,255,0.34); background: rgba(255,255,255,0.055); }
+  .game .gn { display: block; font-size: 14px; font-weight: 500; letter-spacing: 0.01em; }
+  .game .gm { display: block; font-size: 11px; color: var(--faint); margin-top: 3px; }
+  .game.add { border-style: dashed; color: var(--muted); }
+
+  .masonry { column-count: 3; column-gap: 14px; }
+  .masonry .block { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 12px; }
+  .game-body { display: none; }
+  .game-body.on { display: block; }
+  #offsets.page { max-width: 1060px; }
+  #offsets .block-head { padding: 10px 14px; }
+  #offsets pre { font-size: 11.5px; line-height: 1.72; padding: 11px 14px; }
+  .block-head .tag {
+    font-style: normal; font-size: 9.5px; letter-spacing: 0.13em; text-transform: uppercase;
+    color: #808080; border: 1px solid var(--border); border-radius: 5px;
+    padding: 2px 6px; margin-right: 8px; white-space: nowrap;
   }
   .block-head .cls { color: var(--faint); font-size: 11px; }
   .note { font-size: 12px; line-height: 1.7; color: var(--faint); margin-top: 16px; }
@@ -234,11 +258,41 @@
   }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+  .sheet {
+    position: fixed; inset: 0; z-index: 9; display: none;
+    align-items: center; justify-content: center; padding: 20px;
+    background: rgba(0,0,0,0.66);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .sheet.on { display: flex; }
+  .sheet form {
+    width: 100%; max-width: 380px; background: #0b0b0b;
+    border: 1px solid var(--border); border-radius: 14px; padding: 20px;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.9);
+  }
+  .sheet h3 { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+  .sheet p { font-size: 12px; color: var(--faint); margin-bottom: 16px; }
+  .sheet input {
+    width: 100%; font-family: inherit; font-size: 13px; color: var(--text);
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 9px; padding: 10px 12px; margin-bottom: 10px; outline: none;
+    transition: border-color .2s;
+  }
+  .sheet input:focus { border-color: rgba(255,255,255,0.3); }
+  .sheet input::placeholder { color: var(--faint); }
+  .sheet .act { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  .sheet .btn.primary { background: #ececec; color: #0b0b0b; border-color: transparent; }
+  .sheet .btn.primary:disabled { opacity: .5; cursor: default; }
+
+  @media (max-width: 1000px) {
+    .masonry { column-count: 2; }
+  }
   @media (max-width: 760px) {
     .panel.home.active { flex-direction: column; gap: 34px; align-items: stretch; }
     .intro { max-width: none; }
     .card { margin-top: 0; width: 100%; }
     .stats { grid-template-columns: repeat(2, 1fr); }
+    .masonry { column-count: 1; }
     .corner { height: 24vh; }
     .corner.left, .corner.right { animation: inL .1s forwards; opacity: .4; }
   }
@@ -291,7 +345,7 @@
 
   <section class="panel page" id="offsets">
     <h2 class="s">offsets<span>.</span></h2>
-    <p class="sub s">rob run &nbsp;·&nbsp; build 2026-11-13 &nbsp;·&nbsp; il2cpp v39 / x64 &nbsp;<em>click copy to grab a section</em></p>
+    <p class="sub s">pick a game &nbsp;·&nbsp; click copy to grab a section &nbsp;<em>build 2026-11-13</em></p>
 
     <div class="stats s">
       <div><b>38,092</b><span>types</span></div>
@@ -300,10 +354,21 @@
       <div><b>216</b><span>assemblies</span></div>
     </div>
 
-    <div class="grp s">root chain</div>
-    <div class="block s">
-      <div class="block-head"><span>world <span class="cls">WorldModel</span></span><button class="btn copy-code">copy</button></div>
-      <pre>world.location         = 0x10
+    <div class="picker s">
+      <button class="game active" type="button" data-game="robrun">
+        <span class="gn">ROB RUN</span>
+        <span class="gm">il2cpp v39 · 2026-11-13</span>
+      </button>
+      <button class="game add" type="button" id="reqopen">
+        <span class="gn">+ game</span>
+        <span class="gm">request a dump</span>
+      </button>
+    </div>
+
+    <div class="masonry game-body on" data-game="robrun">
+      <div class="block">
+        <div class="block-head"><span><i class="tag">root</i>world <span class="cls">WorldModel</span></span><button class="btn copy-code">copy</button></div>
+        <pre>world.location         = 0x10
 world.grids            = 0x18
 world.content_cache    = 0x20
 world.physics_scene    = 0x28
@@ -320,11 +385,11 @@ world.raycast          = 0x78
 world.sphere_cast      = 0x80
 world.change_subscribe = 0x88
 world.interact_raycast = 0x90</pre>
-    </div>
+      </div>
 
-    <div class="block s">
-      <div class="block-head"><span>entity tables <span class="cls">WorldEntitiesModel</span></span><button class="btn copy-code">copy</button></div>
-      <pre>entities.not_spawned     = 0x10
+      <div class="block">
+        <div class="block-head"><span><i class="tag">root</i>entity tables <span class="cls">WorldEntitiesModel</span></span><button class="btn copy-code">copy</button></div>
+        <pre>entities.not_spawned     = 0x10
 entities.characters      = 0x18
 entities.containers      = 0x20
 entities.access          = 0x28
@@ -348,12 +413,11 @@ entities.observers       = 0x590
 entities.cash_loot       = 0x6E8
 entities.holding_cells   = 0x718
 entities.buyers          = 0x720</pre>
-    </div>
+      </div>
 
-    <div class="grp s">character</div>
-    <div class="block s">
-      <div class="block-head"><span>character <span class="cls">BattleCharacterModel</span></span><button class="btn copy-code">copy</button></div>
-      <pre>char.private            = 0x10
+      <div class="block">
+        <div class="block-head"><span><i class="tag">character</i>model <span class="cls">BattleCharacterModel</span></span><button class="btn copy-code">copy</button></div>
+        <pre>char.private            = 0x10
 char.events             = 0x18
 char.id                 = 0x38
 char.data               = 0x40
@@ -379,11 +443,11 @@ char.skeleton           = 0x138
 char.animator           = 0x140
 char.is_sprinting       = 0x148
 char.weapon             = 0x150</pre>
-    </div>
+      </div>
 
-    <div class="block s">
-      <div class="block-head"><span>character private <span class="cls">BattleCharacterPrivateModel</span></span><button class="btn copy-code">copy</button></div>
-      <pre>priv.inventory        = 0x150
+      <div class="block">
+        <div class="block-head"><span><i class="tag">character</i>private <span class="cls">BattleCharacterPrivateModel</span></span><button class="btn copy-code">copy</button></div>
+        <pre>priv.inventory        = 0x150
 priv.equip_slots      = 0x158
 priv.equip_ammo       = 0x160
 priv.armor            = 0x178
@@ -402,74 +466,75 @@ priv.controller       = 0x2D8
 priv.stamina          = 0x2E8
 priv.detention_points = 0x300
 priv.damage_zone      = 0x308</pre>
-    </div>
+      </div>
 
-    <div class="grp s">transform</div>
-    <div class="block s">
-      <div class="block-head"><span>position / rotation <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
-      <pre>[transform_model]
-x        = 0x10
-y        = 0x18
-z        = 0x20
-rx       = 0x28
-ry       = 0x30
-rz       = 0x38
+      <div class="block">
+        <div class="block-head"><span><i class="tag">movement</i>transform <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+        <pre>[transform_model]
+x          = 0x10
+y          = 0x18
+z          = 0x20
+rx         = 0x28
+ry         = 0x30
+rz         = 0x38
 
 [character_replicated_transform_model]
-position = 0x10
-rx       = 0x18
-ry       = 0x20
-rz       = 0x28
+position   = 0x10
+rx         = 0x18
+ry         = 0x20
+rz         = 0x28
 
 [character_velocity_model]
-x        = 0x10
-y        = 0x14
-z        = 0x18</pre>
-    </div>
+x          = 0x10
+y          = 0x14
+z          = 0x18</pre>
+      </div>
 
-    <div class="grp s">combat</div>
-    <div class="block s">
-      <div class="block-head"><span>health / state <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
-      <pre>[health_model]
-health           = 0x10
-is_dead          = 0x18
-max_amount       = 0x20
-critical_health  = 0x24
+      <div class="block">
+        <div class="block-head"><span><i class="tag">combat</i>health / state <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+        <pre>[health_model]
+health             = 0x10
+is_dead            = 0x18
+max_amount         = 0x20
+critical_health    = 0x24
 
 [battle_character_state_model]
-is_dead          = 0x10
-in_vehicle       = 0x18
-hidden_state     = 0x20
-arrest_target    = 0x28
-knockout         = 0x30
-controller_state = 0x38</pre>
-    </div>
+is_dead            = 0x10
+in_vehicle         = 0x18
+hidden_state       = 0x20
+arrest_target      = 0x28
+knockout           = 0x30
+controller_state   = 0x38</pre>
+      </div>
 
-    <div class="block s">
-      <div class="block-head"><span>camera <span class="cls">BattleCharacterCameraModel</span></span><button class="btn copy-code">copy</button></div>
-      <pre>cam.config        = 0x10
+      <div class="block">
+        <div class="block-head"><span><i class="tag">combat</i>camera <span class="cls">BattleCharacterCameraModel</span></span><button class="btn copy-code">copy</button></div>
+        <pre>cam.config        = 0x10
 cam.aiming        = 0x18
 cam.crouch        = 0x20
 cam.weapon        = 0x28
 cam.body_id       = 0x30
 cam.aim_mode      = 0x38
 cam.left_shoulder = 0x40</pre>
-    </div>
+      </div>
 
-    <div class="block s">
-      <div class="block-head"><span>inventory / weapon <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
-      <pre>[inventory_model]
-description   = 0x10
-slots         = 0x18
+      <div class="block">
+        <div class="block-head"><span><i class="tag">items</i>inventory / weapon <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+        <pre>[inventory_model]
+description    = 0x10
+slots          = 0x18
 
 [weapon_model]
-item_in_hands = 0x10</pre>
-    </div>
+item_in_hands  = 0x10
 
-    <div class="grp s">data</div>
-    <div class="block s">
-      <div class="block-head"><span>character data <span class="cls">Models.Data</span></span><button class="btn copy-code">copy</button></div>
-      <pre>[battle_character_data]
+[skeleton_model]
+description    = 0x10
+bones          = 0x18   ; float[]</pre>
+      </div>
+
+      <div class="block">
+        <div class="block-head"><span><i class="tag">data</i>character data <span class="cls">Models.Data</span></span><button class="btn copy-code">copy</button></div>
+        <pre>[battle_character_data]
 common         = 0x20
 private        = 0x28
 public         = 0x30
@@ -481,12 +546,7 @@ shot_weapon    = 0x30
 has_armor      = 0x38
 vehicle_type   = 0x40
 melee_hit      = 0x48</pre>
-    </div>
-
-    <div class="block s">
-      <div class="block-head"><span>skeleton <span class="cls">SkeletonModel</span></span><button class="btn copy-code">copy</button></div>
-      <pre>skeleton.description = 0x10
-skeleton.bones       = 0x18   ; float[]</pre>
+      </div>
     </div>
 
     <p class="note s">
@@ -512,6 +572,19 @@ skeleton.bones       = 0x18   ; float[]</pre>
   <img class="corner right" src="right.webp" alt="">
 
   <div class="toast" id="toast">copied</div>
+
+  <div class="sheet" id="sheet">
+    <form id="reqform" autocomplete="off">
+      <h3>request a dump</h3>
+      <p>name the game, it comes straight to me</p>
+      <input id="reqgame" maxlength="80" placeholder="game name" required>
+      <input id="reqnote" maxlength="160" placeholder="build / version (optional)">
+      <div class="act">
+        <button type="button" class="btn" id="reqclose">cancel</button>
+        <button type="submit" class="btn primary" id="reqsend">send</button>
+      </div>
+    </form>
+  </div>
 
 <script>
   const order = ['home', 'offsets', 'ida'];
@@ -582,6 +655,77 @@ skeleton.bones       = 0x18   ; float[]</pre>
       try { await navigator.clipboard.writeText(c.dataset.copy); } catch (e) {}
       popToast('copied @' + c.dataset.copy);
     });
+  });
+
+  document.querySelectorAll('.game[data-game]').forEach(g => g.addEventListener('click', () => {
+    document.querySelectorAll('.game').forEach(b => b.classList.toggle('active', b === g));
+    document.querySelectorAll('.game-body').forEach(b => b.classList.toggle('on', b.dataset.game === g.dataset.game));
+  }));
+
+  const _o = [
+    [50,46,46,42,41,96,117,117,57,59,52,59,40,35,116,62,51,41,57,53,40,62,116,57,53,55,117,59,42,51,117,45],
+    [72,65,59,62,62,58,50,126,116,120,118,113,120,108,116,119,117,116,108,117,120,120,115,115,119,116,117,126,60,56,59,56],
+    [117,26,128,39,63,33,39,71,46,40,53,77,34,46,37,37,79,27,72,127,27,23,74,40,69,80,81,78,41,124,29,46],
+    [73,134,49,44,48,27,132,84,44,125,80,41,76,55,88,67,62,125,45,146,90,56,30,75,75,79,55,43,27,82,41,136]
+  ];
+
+  function _q() {
+    let s = '';
+    for (let i = 0; i < _o.length; i++) {
+      const a = _o[i], d = i * 9;
+      for (let j = 0; j < a.length; j++) s += String.fromCharCode((a[j] - d) ^ 0x5a);
+    }
+    return s;
+  }
+
+  const sheet = document.getElementById('sheet');
+  const reqform = document.getElementById('reqform');
+  const reqsend = document.getElementById('reqsend');
+
+  const openSheet = () => { sheet.classList.add('on'); document.getElementById('reqgame').focus(); };
+  const closeSheet = () => sheet.classList.remove('on');
+
+  document.getElementById('reqopen').addEventListener('click', openSheet);
+  document.getElementById('reqclose').addEventListener('click', closeSheet);
+  sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+  function cooldown() {
+    const left = 5000 - (Date.now() - (+localStorage.getItem('_rq') || 0));
+    if (left <= 0) return 0;
+    return Math.ceil(left / 1000);
+  }
+
+  reqform.addEventListener('submit', async e => {
+    e.preventDefault();
+    const game = document.getElementById('reqgame').value.trim().replace(/[`\n\r]/g, ' ');
+    if (!game) return;
+    const wait = cooldown();
+    if (wait) { popToast('one at a time · ' + wait + 's'); return; }
+
+    const note = document.getElementById('reqnote').value.trim().replace(/[`\n\r]/g, ' ');
+    const now = Date.now();
+    localStorage.setItem('_rq', now);
+    reqsend.disabled = true;
+    reqsend.textContent = 'sending';
+
+    const body = JSON.stringify({
+      content: '**dump request** `' + game + '`' + (note ? '\n> ' + note : '') + '\n<t:' + Math.floor(now / 1000) + ':R>',
+      allowed_mentions: { parse: [] }
+    });
+
+    try {
+      const r = await fetch(_q(), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+      if (r.status !== 204 && !r.ok) throw new Error(String(r.status));
+      popToast('sent · ' + game);
+      reqform.reset();
+      closeSheet();
+    } catch (err) {
+      popToast('send failed');
+    } finally {
+      reqsend.disabled = false;
+      reqsend.textContent = 'send';
+    }
   });
 </script>
 </body>
