@@ -178,6 +178,23 @@
     color: var(--text); padding: 14px 16px; margin: 0; overflow-x: auto;
   }
 
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .stats div { background: #0a0a0a; padding: 12px 14px; }
+  .stats b { display: block; font-size: 17px; font-weight: 500; letter-spacing: -0.01em; }
+  .stats span { font-size: 11px; color: var(--faint); }
+
+  .grp {
+    font-size: 10.5px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--faint); margin: 26px 0 10px;
+  }
+  .block-head .cls { color: var(--faint); font-size: 11px; }
+  .note { font-size: 12px; line-height: 1.7; color: var(--faint); margin-top: 16px; }
+
   .item { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 15px 16px; }
   .item + .item { border-top: 1px solid var(--border); }
   .item .name { font-size: 15px; font-weight: 500; }
@@ -221,6 +238,7 @@
     .panel.home.active { flex-direction: column; gap: 34px; align-items: stretch; }
     .intro { max-width: none; }
     .card { margin-top: 0; width: 100%; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
     .corner { height: 24vh; }
     .corner.left, .corner.right { animation: inL .1s forwards; opacity: .4; }
   }
@@ -273,35 +291,219 @@
 
   <section class="panel page" id="offsets">
     <h2 class="s">offsets<span>.</span></h2>
-    <p class="sub s">version ------ &nbsp;·&nbsp; updated --/--/---- &nbsp;<em>click copy to grab a section</em></p>
+    <p class="sub s">rob run &nbsp;·&nbsp; build 2026-11-13 &nbsp;·&nbsp; il2cpp v39 / x64 &nbsp;<em>click copy to grab a section</em></p>
 
+    <div class="stats s">
+      <div><b>38,092</b><span>types</span></div>
+      <div><b>162,137</b><span>fields</span></div>
+      <div><b>264,589</b><span>methods</span></div>
+      <div><b>216</b><span>assemblies</span></div>
+    </div>
+
+    <div class="grp s">root chain</div>
     <div class="block s">
-      <div class="block-head"><span>section one</span><button class="btn copy-code">copy</button></div>
-      <pre>name_one        = 0x0000000
-name_two        = 0x0000000
-name_three      = 0x0000000
-name_four       = 0x0000000</pre>
+      <div class="block-head"><span>world <span class="cls">WorldModel</span></span><button class="btn copy-code">copy</button></div>
+      <pre>world.location         = 0x10
+world.grids            = 0x18
+world.content_cache    = 0x20
+world.physics_scene    = 0x28
+world.battle_data      = 0x30
+world.entities         = 0x38
+world.physics_bodies   = 0x40
+world.teleport         = 0x48
+world.event            = 0x50
+world.safe_zone        = 0x58
+world.vehicles         = 0x60
+world.water_zones      = 0x68
+world.interrupt        = 0x70
+world.raycast          = 0x78
+world.sphere_cast      = 0x80
+world.change_subscribe = 0x88
+world.interact_raycast = 0x90</pre>
     </div>
 
     <div class="block s">
-      <div class="block-head"><span>section two</span><button class="btn copy-code">copy</button></div>
-      <pre>name_one        = 0x0000000
-name_two        = 0x0000000
-name_three      = 0x0000000</pre>
+      <div class="block-head"><span>entity tables <span class="cls">WorldEntitiesModel</span></span><button class="btn copy-code">copy</button></div>
+      <pre>entities.not_spawned     = 0x10
+entities.characters      = 0x18
+entities.containers      = 0x20
+entities.access          = 0x28
+entities.loots           = 0x38
+entities.vehicle_loots   = 0x40
+entities.doors           = 0x48
+entities.vehicles        = 0x58
+entities.cars            = 0x60
+entities.helicopters     = 0x68
+entities.unlocks         = 0x80
+entities.breaches        = 0x88
+entities.metal_detectors = 0x90
+entities.static_loot     = 0x98
+entities.random_loot     = 0xA0
+entities.interact        = 0xA8
+entities.loot_nodes      = 0xB0
+entities.security_panels = 0xB8
+entities.vehicle_trunks  = 0xC0
+entities.cargos          = 0xC8
+entities.observers       = 0x590
+entities.cash_loot       = 0x6E8
+entities.holding_cells   = 0x718
+entities.buyers          = 0x720</pre>
     </div>
+
+    <div class="grp s">character</div>
+    <div class="block s">
+      <div class="block-head"><span>character <span class="cls">BattleCharacterModel</span></span><button class="btn copy-code">copy</button></div>
+      <pre>char.private            = 0x10
+char.events             = 0x18
+char.id                 = 0x38
+char.data               = 0x40
+char.config             = 0x48
+char.body_id            = 0x50
+char.transform          = 0x58
+char.replicated_xform   = 0x60
+char.last_position      = 0x68
+char.look_direction     = 0x70
+char.inputs             = 0x90
+char.input              = 0x98
+char.move_input         = 0xA8
+char.velocity           = 0xB8
+char.fire               = 0xC0
+char.controller_state   = 0xC8
+char.is_dead            = 0xF0
+char.shot_result        = 0x100
+char.damage_immune      = 0x110
+char.hitbox_access      = 0x120
+char.hitbox_id          = 0x128
+char.skeleton_animation = 0x130
+char.skeleton           = 0x138
+char.animator           = 0x140
+char.is_sprinting       = 0x148
+char.weapon             = 0x150</pre>
+    </div>
+
+    <div class="block s">
+      <div class="block-head"><span>character private <span class="cls">BattleCharacterPrivateModel</span></span><button class="btn copy-code">copy</button></div>
+      <pre>priv.inventory        = 0x150
+priv.equip_slots      = 0x158
+priv.equip_ammo       = 0x160
+priv.armor            = 0x178
+priv.quick_slot       = 0x190
+priv.magazine         = 0x198
+priv.quick_slots      = 0x1A8
+priv.health           = 0x1B0
+priv.damage           = 0x1D0
+priv.aiming           = 0x1F0
+priv.hits             = 0x208
+priv.weapon_spread    = 0x228
+priv.cop_info         = 0x268
+priv.move_speed       = 0x2C8
+priv.camera           = 0x2D0
+priv.controller       = 0x2D8
+priv.stamina          = 0x2E8
+priv.detention_points = 0x300
+priv.damage_zone      = 0x308</pre>
+    </div>
+
+    <div class="grp s">transform</div>
+    <div class="block s">
+      <div class="block-head"><span>position / rotation <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+      <pre>[transform_model]
+x        = 0x10
+y        = 0x18
+z        = 0x20
+rx       = 0x28
+ry       = 0x30
+rz       = 0x38
+
+[character_replicated_transform_model]
+position = 0x10
+rx       = 0x18
+ry       = 0x20
+rz       = 0x28
+
+[character_velocity_model]
+x        = 0x10
+y        = 0x14
+z        = 0x18</pre>
+    </div>
+
+    <div class="grp s">combat</div>
+    <div class="block s">
+      <div class="block-head"><span>health / state <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+      <pre>[health_model]
+health           = 0x10
+is_dead          = 0x18
+max_amount       = 0x20
+critical_health  = 0x24
+
+[battle_character_state_model]
+is_dead          = 0x10
+in_vehicle       = 0x18
+hidden_state     = 0x20
+arrest_target    = 0x28
+knockout         = 0x30
+controller_state = 0x38</pre>
+    </div>
+
+    <div class="block s">
+      <div class="block-head"><span>camera <span class="cls">BattleCharacterCameraModel</span></span><button class="btn copy-code">copy</button></div>
+      <pre>cam.config        = 0x10
+cam.aiming        = 0x18
+cam.crouch        = 0x20
+cam.weapon        = 0x28
+cam.body_id       = 0x30
+cam.aim_mode      = 0x38
+cam.left_shoulder = 0x40</pre>
+    </div>
+
+    <div class="block s">
+      <div class="block-head"><span>inventory / weapon <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+      <pre>[inventory_model]
+description   = 0x10
+slots         = 0x18
+
+[weapon_model]
+item_in_hands = 0x10</pre>
+    </div>
+
+    <div class="grp s">data</div>
+    <div class="block s">
+      <div class="block-head"><span>character data <span class="cls">Models.Data</span></span><button class="btn copy-code">copy</button></div>
+      <pre>[battle_character_data]
+common         = 0x20
+private        = 0x28
+public         = 0x30
+
+[battle_character_public_data]
+shot_position  = 0x20
+shot_direction = 0x28
+shot_weapon    = 0x30
+has_armor      = 0x38
+vehicle_type   = 0x40
+melee_hit      = 0x48</pre>
+    </div>
+
+    <div class="block s">
+      <div class="block-head"><span>skeleton <span class="cls">SkeletonModel</span></span><button class="btn copy-code">copy</button></div>
+      <pre>skeleton.description = 0x10
+skeleton.bones       = 0x18   ; float[]</pre>
+    </div>
+
+    <p class="note s">
+      instance offsets are relative to the managed object base, header included.
+      struct entries add 0x10 for the boxed header. statics are relative to static storage.
+      runtime generic layouts have no fixed offset — resolve the constructed type first.
+      full export: 216 headers, csv + json, on request.
+    </p>
   </section>
 
   <section class="panel page" id="ida">
     <h2 class="s">ida<span>.</span></h2>
-    <p class="sub s">the disassembler, straight from hex-rays &nbsp;<em>the real one</em></p>
+    <p class="sub s">one source, the cracked build &nbsp;<em>hexrays.su</em></p>
     <div class="block s">
       <div class="item">
-        <div><div class="name">IDA Free</div><div class="meta">official download · hex-rays.com</div></div>
-        <a class="btn" href="https://hex-rays.com/ida-free" target="_blank" rel="noopener">download ↗</a>
-      </div>
-      <div class="item">
-        <div><div class="name">IDA Pro</div><div class="meta">official page · hex-rays.com</div></div>
-        <a class="btn" href="https://hex-rays.com/ida-pro" target="_blank" rel="noopener">open ↗</a>
+        <div><div class="name">IDA Pro 9.5</div><div class="meta">cracked · 2026-10-27 · torrent / magnet</div></div>
+        <a class="btn" href="https://hexrays.su/" target="_blank" rel="noopener">download ↗</a>
       </div>
     </div>
   </section>
