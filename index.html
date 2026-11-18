@@ -4,31 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>dom</title>
+<meta name="description" content="dom - reverse engineering, il2cpp offsets, ida.">
+<meta name="theme-color" content="#060607">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23060607'/%3E%3Ctext x='16' y='24' font-family='monospace' font-size='19' fill='%239df0c8' text-anchor='middle'%3Ed%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
 <style>
-  @property --accent {
-    syntax: '<color>';
-    inherits: true;
-    initial-value: #bdbdbd;
-  }
-  @keyframes hue {
-    0%, 100% { --accent: #bdbdbd; }
-    33%      { --accent: #6e6e6e; }
-    66%      { --accent: #ffffff; }
-  }
-
   :root {
-    --bg: #050505;
-    --dot: rgba(255,255,255,0.055);
+    --bg: #060607;
+    --dot: rgba(255,255,255,0.05);
     --text: #f0f0f0;
-    --muted: #9a9a9a;
-    --faint: #5a5a5a;
-    --card: rgba(14,14,14,0.7);
+    --muted: #97979b;
+    --faint: #5c5c61;
+    --card: rgba(13,13,15,0.72);
     --border: rgba(255,255,255,0.07);
+    --accent: #9df0c8;
+    --accent-soft: rgba(157,240,200,0.14);
     --ease: cubic-bezier(.2,.75,.2,1);
-    animation: hue 14s ease-in-out infinite;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,17 +29,57 @@
 
   body {
     background-color: var(--bg);
-    background-image: radial-gradient(var(--dot) 1px, transparent 1px);
-    background-size: 6px 6px;
+    background-image:
+      radial-gradient(circle at 50% -10%, rgba(157,240,200,0.055), transparent 52%),
+      radial-gradient(var(--dot) 1px, transparent 1px);
+    background-size: 100% 100%, 22px 22px;
+    background-attachment: fixed, fixed;
     color: var(--text);
     font-family: "Outfit", system-ui, sans-serif;
     overflow-x: hidden;
     min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    padding: 100px 16px 60px;
+    display: flex; align-items: center; align-items: safe center; justify-content: center;
+    padding: 100px 16px 74px;
     -webkit-font-smoothing: antialiased;
   }
-  ::selection { background: #e6e6e6; color: #000; }
+  ::selection { background: var(--accent); color: #04120c; }
+  :focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+  .grain {
+    position: fixed; inset: -50%; z-index: 4; pointer-events: none;
+    opacity: .05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .progress {
+    position: fixed; top: 0; left: 0; height: 1px; width: 0;
+    background: var(--accent); z-index: 8; opacity: .55;
+    box-shadow: 0 0 12px var(--accent);
+    transition: width .12s linear;
+  }
+
+  .status {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 7;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    height: 30px; padding: 0 16px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10.5px; letter-spacing: 0.06em; color: var(--faint);
+    background: rgba(6,6,7,0.86); border-top: 1px solid var(--border);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    white-space: nowrap; overflow: hidden;
+  }
+  .status b { color: var(--muted); font-weight: 400; }
+  .status .dot {
+    display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent); margin-right: 7px; vertical-align: middle;
+    box-shadow: 0 0 8px var(--accent); animation: pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+  .status .mid { display: flex; gap: 18px; align-items: center; }
+  .status .k { color: #3f3f44; }
+  .status .k em {
+    font-style: normal; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; margin-right: 3px;
+  }
 
   .glow {
     position: fixed; width: 640px; height: 640px; border-radius: 50%;
@@ -81,7 +114,7 @@
   .pill {
     position: absolute; top: 4px; bottom: 4px; left: 0; width: 0;
     border-radius: 999px; background: #ececec;
-    box-shadow: 0 0 18px rgba(255,255,255,0.12);
+    box-shadow: 0 0 22px rgba(157,240,200,0.18);
     transition: transform .55s var(--ease), width .55s var(--ease);
   }
 
@@ -108,11 +141,32 @@
   }
   .intro { max-width: 350px; }
 
+  .eyebrow {
+    display: flex; align-items: center; gap: 10px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 20px;
+  }
+  .eyebrow::before { content: ""; width: 20px; height: 1px; background: var(--accent); opacity: .8; }
+
+  .hex {
+    position: fixed; top: 0; bottom: 30px; right: 0; width: 200px;
+    padding: 90px 16px 40px 0; overflow: hidden; pointer-events: none; z-index: 0;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10px; line-height: 20px; text-align: right;
+    color: rgba(255,255,255,0.075); white-space: pre;
+    mask-image: linear-gradient(180deg, transparent, #000 18%, #000 76%, transparent);
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 76%, transparent);
+  }
+  .hex span { display: block; animation: drift 40s linear infinite; }
+  .hex { transition: opacity .45s ease; }
+  @keyframes drift { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+
   h1 {
     font-size: clamp(72px, 11vw, 120px);
     font-weight: 600; letter-spacing: -0.05em; line-height: .9;
     margin-bottom: 28px; white-space: nowrap;
-    background: linear-gradient(100deg, #f0f0f0 0%, #f0f0f0 30%, #6e6e6e 50%, #f0f0f0 70%, #f0f0f0 100%);
+    background: linear-gradient(100deg, #f0f0f0 0%, #f0f0f0 30%, #6a8f80 50%, #f0f0f0 70%, #f0f0f0 100%);
     background-size: 250% 100%;
     -webkit-background-clip: text; background-clip: text; color: transparent;
     animation: sheen 8s ease-in-out 1s infinite;
@@ -160,14 +214,15 @@
   .page h2 span { color: var(--accent); }
   .page .sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
   .page .sub em { font-family: "Instrument Serif", serif; font-size: 16px; color: var(--faint); }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; font-weight: 400; letter-spacing: 0.02em; }
 
   .block {
     position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 12px;
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     margin-bottom: 14px; overflow: hidden;
-    transition: border-color .3s;
+    transition: border-color .3s, box-shadow .3s;
   }
-  .block:hover { border-color: rgba(255,255,255,0.13); }
+  .block:hover { border-color: rgba(255,255,255,0.14); box-shadow: 0 16px 40px -24px rgba(157,240,200,0.25); }
   .block-head {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
     padding: 12px 16px; border-bottom: 1px solid var(--border);
@@ -194,19 +249,24 @@
   .stats span { font-size: 11px; color: var(--faint); }
 
   .picker {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    gap: 10px; flex: 1 1 auto;
+    display: flex; flex-wrap: wrap; gap: 10px; flex: 1 1 auto;
   }
-  .pickrow { display: flex; align-items: stretch; gap: 10px; margin-bottom: 14px; }
-  .pickrow .btn { align-self: center; white-space: nowrap; }
+  .pickrow { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .pickrow .btn { flex: 0 0 auto; white-space: nowrap; }
   .game {
+    flex: 0 1 224px; min-width: 0;
     text-align: left; font-family: inherit; color: var(--text); text-decoration: none;
     background: var(--card); border: 1px solid var(--border); border-radius: 12px;
     padding: 11px 14px; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     transition: border-color .25s, background .25s;
   }
   .game:hover { border-color: rgba(255,255,255,0.2); }
-  .game.active { border-color: rgba(255,255,255,0.34); background: rgba(255,255,255,0.055); }
+  .game.active { border-color: rgba(157,240,200,0.4); background: rgba(157,240,200,0.045); }
+  .game.active .gn::after {
+    content: ""; display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent); margin-left: 8px; vertical-align: 2px;
+    box-shadow: 0 0 8px var(--accent);
+  }
   .game .gn { display: block; font-size: 14px; font-weight: 500; letter-spacing: 0.01em; }
   .game .gm { display: block; font-size: 11px; color: var(--faint); margin-top: 3px; }
   .game.add { border-style: dashed; color: var(--muted); }
@@ -216,6 +276,7 @@
   .game-body { display: none; }
   .game-body.on { display: block; }
   #offsets.page { max-width: 1060px; }
+  #ida.page { max-width: 620px; }
   #offsets .block-head { padding: 10px 14px; }
   #offsets pre { font-size: 11.5px; line-height: 1.72; padding: 11px 14px; }
   .block-head .tag {
@@ -226,10 +287,65 @@
   .block-head .cls { color: var(--faint); font-size: 11px; }
   .note { font-size: 12px; line-height: 1.7; color: var(--faint); margin-top: 16px; }
 
-  .item { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 15px 16px; }
-  .item + .item { border-top: 1px solid var(--border); }
-  .item .name { font-size: 15px; font-weight: 500; }
-  .item .meta { font-size: 12px; color: var(--faint); margin-top: 3px; }
+  .tag.t-root      { color: #9df0c8; border-color: rgba(157,240,200,0.22); }
+  .tag.t-character { color: #8ec7f0; border-color: rgba(142,199,240,0.22); }
+  .tag.t-movement  { color: #b3a6f5; border-color: rgba(179,166,245,0.22); }
+  .tag.t-combat    { color: #f0a08e; border-color: rgba(240,160,142,0.22); }
+  .tag.t-items     { color: #e8d48a; border-color: rgba(232,212,138,0.22); }
+  .tag.t-data      { color: #9ad9c8; border-color: rgba(154,217,200,0.22); }
+
+  .block pre .k  { color: var(--muted); }
+  .block pre .hv { color: var(--accent); }
+  .block pre .cm { color: #4b4b52; }
+  .block pre .sec { color: #7b7b84; letter-spacing: 0.02em; }
+  .block pre {
+    background: linear-gradient(180deg, rgba(255,255,255,0.012), transparent 60%);
+  }
+  .masonry .block pre { tab-size: 2; }
+
+  .live {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px; letter-spacing: 0.06em; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 999px;
+    background: rgba(255,255,255,0.015);
+    padding: 7px 13px 7px 11px; margin-bottom: 24px;
+    cursor: pointer; transition: border-color .25s, color .25s, background .25s;
+  }
+  .live:hover { border-color: rgba(157,240,200,0.3); color: var(--text); background: rgba(157,240,200,0.04); }
+  .live .pulse {
+    width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 9px var(--accent); animation: pulse 2.4s ease-in-out infinite;
+  }
+  .live i { font-style: normal; color: var(--faint); transition: transform .25s, color .25s; }
+  .live:hover i { transform: translateX(3px); color: var(--accent); }
+
+  .idacard {
+    position: relative; overflow: hidden;
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    padding: 22px 22px 20px;
+  }
+  .idacard::before {
+    content: ""; position: absolute; top: -1px; left: 12%; right: 12%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .idacard::after {
+    content: ""; position: absolute; right: -70px; top: -70px; width: 220px; height: 220px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(157,240,200,0.09), transparent 65%);
+    pointer-events: none;
+  }
+  .idatop { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+  .idabig {
+    font-size: 74px; font-weight: 200; line-height: 1;
+    color: transparent; -webkit-text-stroke: 1.25px rgba(157,240,200,0.6);
+  }
+  .idaname { font-size: 17px; font-weight: 500; letter-spacing: -0.01em; }
+  .idameta { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 10.5px; color: var(--faint); margin-top: 5px; letter-spacing: 0.05em; }
+  .idacard .row { padding: 10px 0; font-size: 12.5px; }
+  .idacard .btn.wide { display: block; text-align: center; margin-top: 16px; padding: 11px; border-radius: 9px; }
+  .idacard .btn.wide:hover { border-color: rgba(157,240,200,0.4); background: rgba(157,240,200,0.06); color: var(--accent); }
+  .ida-note { margin-top: 16px; }
 
   .btn {
     font-family: inherit; font-size: 12px; color: var(--text); text-decoration: none; white-space: nowrap;
@@ -239,6 +355,7 @@
   }
   .btn:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); }
   .btn:active { transform: scale(.96); }
+  .btn.copied { color: var(--accent); border-color: rgba(157,240,200,0.35); }
   .block-head .btn { padding: 5px 11px; font-size: 11.5px; }
 
   .corner {
@@ -247,7 +364,10 @@
     pointer-events: none; user-select: none;
     filter: drop-shadow(0 0 34px color-mix(in srgb, var(--accent) 14%, transparent));
     opacity: 0;
+    transition: opacity .45s var(--ease), transform .45s var(--ease);
   }
+  body[data-tab]:not([data-tab="home"]) .corner { opacity: 0 !important; transform: translateY(28px); }
+  body[data-tab]:not([data-tab="home"]) .hex { opacity: 0; }
   .corner.left  { left: 0;  object-position: left bottom;
                   animation: inL 1.2s .5s var(--ease) forwards, float 7s 1.7s ease-in-out infinite; }
   .corner.right { right: 0; object-position: right bottom;
@@ -257,7 +377,7 @@
   @keyframes float { 0%,100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-7px); opacity: 1; } }
 
   .toast {
-    position: fixed; bottom: 26px; left: 50%; transform: translate(-50%, 20px);
+    position: fixed; bottom: 46px; left: 50%; transform: translate(-50%, 20px);
     font-size: 12.5px;
     background: var(--card); border: 1px solid var(--border);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -291,6 +411,9 @@
   .sheet .btn.primary { background: #ececec; color: #0b0b0b; border-color: transparent; }
   .sheet .btn.primary:disabled { opacity: .5; cursor: default; }
 
+  @media (max-width: 1320px) {
+    .hex { display: none; }
+  }
   @media (max-width: 1000px) {
     .masonry { column-count: 2; }
   }
@@ -301,9 +424,10 @@
     .stats { grid-template-columns: repeat(2, 1fr); }
     .masonry { column-count: 1; }
     .pickrow { flex-wrap: wrap; }
+    .game { flex: 1 1 100%; }
     .pickrow .btn { width: 100%; }
-    .corner { height: 24vh; }
-    .corner.left, .corner.right { animation: inL .1s forwards; opacity: .4; }
+    .status .mid { display: none; }
+    .corner { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before { animation-duration: .01s !important; animation-iteration-count: 1 !important; transition-duration: .01s !important; }
@@ -313,6 +437,9 @@
 <body>
   <div class="glow" id="glow"></div>
   <div class="vignette"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <div class="hex" id="hex" aria-hidden="true"></div>
 
   <nav class="nav" id="nav">
     <span class="pill" id="pill"></span>
@@ -323,12 +450,17 @@
 
   <main class="panel home" id="home">
     <section class="intro">
+      <div class="eyebrow s">~/dom · x64 · release</div>
       <div class="s"><h1>dom<span class="cursor">_</span></h1></div>
 
       <p class="bio s">
         I'm dom. A reverse engineer enjoyer who likes taking things
         apart to see how they really work, one byte at a time
       </p>
+
+      <button class="live s opensheet" type="button">
+        <span class="pulse"></span> open for dump requests <i>&rarr;</i>
+      </button>
 
       <ul class="facts s">
         <li>reverse engineer enjoyer</li>
@@ -348,6 +480,10 @@
       <div class="row">
         <span class="label">github</span>
         <a class="value" href="https://github.com/quietdom" target="_blank" rel="noopener">quietdom ↗</a>
+      </div>
+      <div class="row">
+        <span class="label">last dump</span>
+        <span class="value mono">2026-11-13</span>
       </div>
     </aside>
   </main>
@@ -379,7 +515,7 @@
 
     <div class="masonry game-body on" data-game="robrun">
       <div class="block">
-        <div class="block-head"><span><i class="tag">root</i> world <span class="cls">WorldModel</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag t-root">root</i> world <span class="cls">WorldModel</span></span><button class="btn copy-code">copy</button></div>
         <pre>world.location         = 0x10
 world.grids            = 0x18
 world.content_cache    = 0x20
@@ -400,7 +536,7 @@ world.interact_raycast = 0x90</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">root</i> entity tables <span class="cls">WorldEntitiesModel</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag t-root">root</i> entity tables <span class="cls">WorldEntitiesModel</span></span><button class="btn copy-code">copy</button></div>
         <pre>entities.not_spawned     = 0x10
 entities.characters      = 0x18
 entities.containers      = 0x20
@@ -428,7 +564,7 @@ entities.buyers          = 0x720</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">character</i> model <span class="cls">BattleCharacterModel</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag t-character">character</i> model <span class="cls">BattleCharacterModel</span></span><button class="btn copy-code">copy</button></div>
         <pre>char.private            = 0x10
 char.events             = 0x18
 char.id                 = 0x38
@@ -458,7 +594,7 @@ char.weapon             = 0x150</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">character</i> private <span class="cls">BattleCharacterPrivateModel</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag t-character">character</i> private <span class="cls">BattleCharacterPrivateModel</span></span><button class="btn copy-code">copy</button></div>
         <pre>priv.inventory        = 0x150
 priv.equip_slots      = 0x158
 priv.equip_ammo       = 0x160
@@ -481,7 +617,7 @@ priv.damage_zone      = 0x308</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">movement</i> transform <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag t-movement">movement</i> transform <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
         <pre>[transform_model]
 x          = 0x10
 y          = 0x18
@@ -503,7 +639,7 @@ z          = 0x18</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">combat</i> health / state <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag t-combat">combat</i> health / state <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
         <pre>[health_model]
 health             = 0x10
 is_dead            = 0x18
@@ -520,7 +656,7 @@ controller_state   = 0x38</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">combat</i> camera <span class="cls">BattleCharacterCameraModel</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag t-combat">combat</i> camera <span class="cls">BattleCharacterCameraModel</span></span><button class="btn copy-code">copy</button></div>
         <pre>cam.config        = 0x10
 cam.aiming        = 0x18
 cam.crouch        = 0x20
@@ -531,7 +667,7 @@ cam.left_shoulder = 0x40</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">items</i> inventory / weapon <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag t-items">items</i> inventory / weapon <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
         <pre>[inventory_model]
 description    = 0x10
 slots          = 0x18
@@ -545,7 +681,7 @@ bones          = 0x18   ; float[]</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">data</i> character data <span class="cls">Models.Data</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag t-data">data</i> character data <span class="cls">Models.Data</span></span><button class="btn copy-code">copy</button></div>
         <pre>[battle_character_data]
 common         = 0x20
 private        = 0x28
@@ -572,18 +708,40 @@ melee_hit      = 0x48</pre>
   <section class="panel page" id="ida">
     <h2 class="s">ida<span>.</span></h2>
     <p class="sub s">one source, the cracked build &nbsp;<em>hexrays.su</em></p>
-    <div class="block s">
-      <div class="item">
-        <div><div class="name">IDA Pro 9.5</div><div class="meta">cracked · 2026-10-27 · torrent / magnet</div></div>
-        <a class="btn" href="https://hexrays.su/" target="_blank" rel="noopener">download ↗</a>
+
+    <div class="idacard s">
+      <div class="idatop">
+        <div class="idabig">9.5</div>
+        <div>
+          <div class="idaname">IDA Pro</div>
+          <div class="idameta">cracked · 2026-10-27</div>
+        </div>
       </div>
+      <div class="row"><span class="label">package</span><span class="value mono">torrent / magnet</span></div>
+      <div class="row"><span class="label">host</span><span class="value mono">hexrays.su</span></div>
+      <div class="row"><span class="label">target</span><span class="value mono">win64 · x64</span></div>
+      <a class="btn wide" href="https://hexrays.su/" target="_blank" rel="noopener">download &nearr;</a>
     </div>
+
+    <p class="note ida-note s">
+      single entry, no mirrors. the magnet ships the full installer plus the
+      keygen; unpack to a clean directory and keep the install offline.
+    </p>
   </section>
 
   <img class="corner left" src="left.webp" alt="">
   <img class="corner right" src="right.webp" alt="">
 
   <div class="toast" id="toast">copied</div>
+
+  <div class="status" aria-hidden="true">
+    <div><span class="dot"></span><b id="st-sec">home</b></div>
+    <div class="mid">
+      <span>rip <b id="st-addr">0x400000</b></span>
+      <span>build <b>2026-11-13</b></span>
+    </div>
+    <div class="k"><em>1</em><em>2</em><em>3</em> jump</div>
+  </div>
 
   <div class="sheet" id="sheet">
     <form id="reqform" autocomplete="off">
@@ -600,6 +758,12 @@ melee_hit      = 0x48</pre>
 
 <script>
   const order = ['home', 'offsets', 'ida'];
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  addEventListener('load', () => {
+    if (!location.hash) return;
+    const reset = () => window.scrollTo(0, 0);
+    reset(); requestAnimationFrame(reset); setTimeout(reset, 80);
+  });
   const nav = document.getElementById('nav');
   const pill = document.getElementById('pill');
   let current = null;
@@ -626,6 +790,7 @@ melee_hit      = 0x48</pre>
     const prev = current && document.getElementById(current);
     movePill(id, !current);
     current = id;
+    document.body.dataset.tab = id;
     clearTimeout(busy);
     document.querySelectorAll('.panel.leaving').forEach(p => p.classList.remove('leaving', 'active'));
 
@@ -641,7 +806,11 @@ melee_hit      = 0x48</pre>
     } else enter();
   }
 
-  addEventListener('hashchange', () => show(location.hash.slice(1)));
+  addEventListener('hashchange', () => {
+    const id = location.hash.slice(1);
+    if (id && id === current) window.scrollTo(0, 0);
+    show(id);
+  });
   addEventListener('resize', () => current && movePill(current, true));
   document.fonts.ready.then(() => current && movePill(current, true));
   show(location.hash.slice(1) || 'home');
@@ -656,9 +825,35 @@ melee_hit      = 0x48</pre>
     setTimeout(() => toast.classList.remove('show'), 1300);
   }
 
+  function flash(b) {
+    if (!b) return;
+    const label = b.dataset.label || b.textContent;
+    b.dataset.label = label;
+    b.classList.add('copied');
+    b.textContent = 'copied';
+    clearTimeout(b._t);
+    b._t = setTimeout(() => { b.classList.remove('copied'); b.textContent = label; }, 1100);
+  }
+
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  document.querySelectorAll('.block pre').forEach(pre => {
+    const lines = pre.textContent.split('\n');
+    pre.innerHTML = lines.map(line => {
+      const m = line.match(/^(\s*)([A-Za-z0-9_.]+)(\s*=\s*)(0x[0-9A-Fa-f]+)(.*)$/);
+      if (m) {
+        return m[1] + '<span class="k">' + esc(m[2]) + '</span>' + m[3] +
+               '<span class="hv">' + m[4] + '</span><span class="cm">' + esc(m[5]) + '</span>';
+      }
+      if (/^\s*\[[^\]]+\]\s*$/.test(line)) return '<span class="sec">' + esc(line.trim()) + '</span>';
+      return esc(line);
+    }).join('\n');
+  });
+
   document.querySelectorAll('.copy-code').forEach(b => b.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(b.closest('.block').querySelector('pre').innerText); } catch (e) {}
     popToast('copied ' + b.previousElementSibling.textContent);
+    flash(b);
   }));
 
   document.getElementById('copyall').addEventListener('click', async () => {
@@ -667,6 +862,7 @@ melee_hit      = 0x48</pre>
     const parts = [...body.querySelectorAll('pre')].map(p => p.innerText.trim());
     try { await navigator.clipboard.writeText(parts.join('\n\n')); } catch (e) {}
     popToast('copied all · ' + parts.length + ' sections');
+    flash(document.getElementById('copyall'));
   });
 
   document.querySelectorAll('.copy').forEach(c => {
@@ -706,6 +902,7 @@ melee_hit      = 0x48</pre>
   const closeSheet = () => sheet.classList.remove('on');
 
   document.getElementById('reqopen').addEventListener('click', openSheet);
+  document.querySelectorAll('.opensheet').forEach(b => b.addEventListener('click', openSheet));
   document.getElementById('reqclose').addEventListener('click', closeSheet);
   sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
   addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
@@ -746,6 +943,46 @@ melee_hit      = 0x48</pre>
       reqsend.disabled = false;
       reqsend.textContent = 'send';
     }
+  });
+
+  const hexEl = document.getElementById('hex');
+  if (hexEl) {
+    const line = a => a.toString(16).toUpperCase().padStart(8, '0') + '  ' +
+      Array.from({ length: 7 }, () => Math.floor(Math.random() * 256).toString(16).toUpperCase().padStart(2, '0')).join(' ');
+    let a = 0x7FF6A2C41000, txt = '';
+    for (let i = 0; i < 46; i++) { txt += line(a) + '\n'; a += 0x10; }
+    const s = document.createElement('span');
+    s.textContent = txt + txt;
+    hexEl.appendChild(s);
+  }
+
+  const prog = document.getElementById('progress');
+  const stAddr = document.getElementById('st-addr');
+  const stSec = document.getElementById('st-sec');
+  let raf = 0;
+
+  function tickScroll() {
+    raf = 0;
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const y = h.scrollTop;
+    prog.style.width = (max > 0 ? Math.min(100, (y / max) * 100) : 0) + '%';
+    stAddr.textContent = '0x' + (0x400000 + y * 16).toString(16).toUpperCase().padStart(8, '0');
+    stSec.textContent = current || 'home';
+  }
+
+  const onScroll = () => { if (!raf) raf = requestAnimationFrame(tickScroll); };
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  addEventListener('hashchange', onScroll);
+  tickScroll();
+
+  addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    const map = { '1': 'home', '2': 'offsets', '3': 'ida' };
+    if (map[e.key]) { e.preventDefault(); location.hash = '#' + map[e.key]; }
   });
 </script>
 </body>
