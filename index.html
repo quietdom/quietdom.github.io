@@ -169,10 +169,15 @@
   }
   .block:hover { border-color: rgba(255,255,255,0.13); }
   .block-head {
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
     padding: 12px 16px; border-bottom: 1px solid var(--border);
     font-size: 13px; color: var(--muted);
   }
+  .block-head > span:first-child {
+    display: block; flex: 1 1 auto; min-width: 0;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+  .block-head .btn { flex: 0 0 auto; }
   .block pre {
     font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; line-height: 1.9;
     color: var(--text); padding: 14px 16px; margin: 0; overflow-x: auto;
@@ -190,8 +195,10 @@
 
   .picker {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    gap: 10px; margin-bottom: 14px;
+    gap: 10px; flex: 1 1 auto;
   }
+  .pickrow { display: flex; align-items: stretch; gap: 10px; margin-bottom: 14px; }
+  .pickrow .btn { align-self: center; white-space: nowrap; }
   .game {
     text-align: left; font-family: inherit; color: var(--text); text-decoration: none;
     background: var(--card); border: 1px solid var(--border); border-radius: 12px;
@@ -293,6 +300,8 @@
     .card { margin-top: 0; width: 100%; }
     .stats { grid-template-columns: repeat(2, 1fr); }
     .masonry { column-count: 1; }
+    .pickrow { flex-wrap: wrap; }
+    .pickrow .btn { width: 100%; }
     .corner { height: 24vh; }
     .corner.left, .corner.right { animation: inL .1s forwards; opacity: .4; }
   }
@@ -354,20 +363,23 @@
       <div><b>216</b><span>assemblies</span></div>
     </div>
 
-    <div class="picker s">
-      <button class="game active" type="button" data-game="robrun">
-        <span class="gn">ROB RUN</span>
-        <span class="gm">il2cpp v39 · 2026-11-13</span>
-      </button>
-      <button class="game add" type="button" id="reqopen">
-        <span class="gn">+ game</span>
-        <span class="gm">request a dump</span>
-      </button>
+    <div class="pickrow s">
+      <div class="picker">
+        <button class="game active" type="button" data-game="robrun">
+          <span class="gn">ROB RUN</span>
+          <span class="gm">il2cpp v39 · 2026-11-13</span>
+        </button>
+        <button class="game add" type="button" id="reqopen">
+          <span class="gn">+ game</span>
+          <span class="gm">request a dump</span>
+        </button>
+      </div>
+      <button class="btn" type="button" id="copyall">copy all</button>
     </div>
 
     <div class="masonry game-body on" data-game="robrun">
       <div class="block">
-        <div class="block-head"><span><i class="tag">root</i>world <span class="cls">WorldModel</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag">root</i> world <span class="cls">WorldModel</span></span><button class="btn copy-code">copy</button></div>
         <pre>world.location         = 0x10
 world.grids            = 0x18
 world.content_cache    = 0x20
@@ -388,7 +400,7 @@ world.interact_raycast = 0x90</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">root</i>entity tables <span class="cls">WorldEntitiesModel</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag">root</i> entity tables <span class="cls">WorldEntitiesModel</span></span><button class="btn copy-code">copy</button></div>
         <pre>entities.not_spawned     = 0x10
 entities.characters      = 0x18
 entities.containers      = 0x20
@@ -416,7 +428,7 @@ entities.buyers          = 0x720</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">character</i>model <span class="cls">BattleCharacterModel</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag">character</i> model <span class="cls">BattleCharacterModel</span></span><button class="btn copy-code">copy</button></div>
         <pre>char.private            = 0x10
 char.events             = 0x18
 char.id                 = 0x38
@@ -446,7 +458,7 @@ char.weapon             = 0x150</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">character</i>private <span class="cls">BattleCharacterPrivateModel</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag">character</i> private <span class="cls">BattleCharacterPrivateModel</span></span><button class="btn copy-code">copy</button></div>
         <pre>priv.inventory        = 0x150
 priv.equip_slots      = 0x158
 priv.equip_ammo       = 0x160
@@ -469,7 +481,7 @@ priv.damage_zone      = 0x308</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">movement</i>transform <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag">movement</i> transform <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
         <pre>[transform_model]
 x          = 0x10
 y          = 0x18
@@ -491,7 +503,7 @@ z          = 0x18</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">combat</i>health / state <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag">combat</i> health / state <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
         <pre>[health_model]
 health             = 0x10
 is_dead            = 0x18
@@ -508,7 +520,7 @@ controller_state   = 0x38</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">combat</i>camera <span class="cls">BattleCharacterCameraModel</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag">combat</i> camera <span class="cls">BattleCharacterCameraModel</span></span><button class="btn copy-code">copy</button></div>
         <pre>cam.config        = 0x10
 cam.aiming        = 0x18
 cam.crouch        = 0x20
@@ -519,7 +531,7 @@ cam.left_shoulder = 0x40</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">items</i>inventory / weapon <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag">items</i> inventory / weapon <span class="cls">Models.dll</span></span><button class="btn copy-code">copy</button></div>
         <pre>[inventory_model]
 description    = 0x10
 slots          = 0x18
@@ -533,7 +545,7 @@ bones          = 0x18   ; float[]</pre>
       </div>
 
       <div class="block">
-        <div class="block-head"><span><i class="tag">data</i>character data <span class="cls">Models.Data</span></span><button class="btn copy-code">copy</button></div>
+        <div class="block-head"><span><i class="tag">data</i> character data <span class="cls">Models.Data</span></span><button class="btn copy-code">copy</button></div>
         <pre>[battle_character_data]
 common         = 0x20
 private        = 0x28
@@ -648,6 +660,14 @@ melee_hit      = 0x48</pre>
     try { await navigator.clipboard.writeText(b.closest('.block').querySelector('pre').innerText); } catch (e) {}
     popToast('copied ' + b.previousElementSibling.textContent);
   }));
+
+  document.getElementById('copyall').addEventListener('click', async () => {
+    const body = document.querySelector('.game-body.on');
+    if (!body) return;
+    const parts = [...body.querySelectorAll('pre')].map(p => p.innerText.trim());
+    try { await navigator.clipboard.writeText(parts.join('\n\n')); } catch (e) {}
+    popToast('copied all · ' + parts.length + ' sections');
+  });
 
   document.querySelectorAll('.copy').forEach(c => {
     c.title = 'click to copy';
