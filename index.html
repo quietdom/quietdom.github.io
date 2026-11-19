@@ -483,19 +483,19 @@
       </div>
       <div class="row">
         <span class="label">last dump</span>
-        <span class="value mono">2026-11-13</span>
+        <span class="value mono">2026-11-19</span>
       </div>
     </aside>
   </main>
 
   <section class="panel page" id="offsets">
     <h2 class="s">offsets<span>.</span></h2>
-    <p class="sub s">pick a game &nbsp;·&nbsp; click copy to grab a section &nbsp;<em>build 2026-11-13</em></p>
+    <p class="sub s">pick a game &nbsp;·&nbsp; click copy to grab a section &nbsp;<em>build 2026-11-19</em></p>
 
     <div class="stats s">
-      <div><b>38,092</b><span>types</span></div>
-      <div><b>162,137</b><span>fields</span></div>
-      <div><b>264,589</b><span>methods</span></div>
+      <div><b>23,047</b><span>types</span></div>
+      <div><b>133,150</b><span>fields</span></div>
+      <div><b>239,958</b><span>methods</span></div>
       <div><b>216</b><span>assemblies</span></div>
     </div>
 
@@ -503,7 +503,7 @@
       <div class="picker">
         <button class="game active" type="button" data-game="robrun">
           <span class="gn">ROB RUN</span>
-          <span class="gm">il2cpp v39 · 2026-11-13</span>
+          <span class="gm">il2cpp v39 · 2026-11-19</span>
         </button>
         <button class="game add" type="button" id="reqopen">
           <span class="gn">+ game</span>
@@ -532,7 +532,9 @@ world.interrupt        = 0x70
 world.raycast          = 0x78
 world.sphere_cast      = 0x80
 world.change_subscribe = 0x88
-world.interact_raycast = 0x90</pre>
+world.interact_raycast = 0x90
+world.broad_phase      = 0x98
+world.narrow_phase     = 0xA0</pre>
       </div>
 
       <div class="block">
@@ -541,12 +543,16 @@ world.interact_raycast = 0x90</pre>
 entities.characters      = 0x18
 entities.containers      = 0x20
 entities.access          = 0x28
+entities.alarms          = 0x30
 entities.loots           = 0x38
 entities.vehicle_loots   = 0x40
 entities.doors           = 0x48
+entities.kinematic       = 0x50
 entities.vehicles        = 0x58
 entities.cars            = 0x60
 entities.helicopters     = 0x68
+entities.breakables      = 0x70
+entities.open_close      = 0x78
 entities.unlocks         = 0x80
 entities.breaches        = 0x88
 entities.metal_detectors = 0x90
@@ -557,10 +563,60 @@ entities.loot_nodes      = 0xB0
 entities.security_panels = 0xB8
 entities.vehicle_trunks  = 0xC0
 entities.cargos          = 0xC8
-entities.observers       = 0x590
-entities.cash_loot       = 0x6E8
-entities.holding_cells   = 0x718
-entities.buyers          = 0x720</pre>
+entities.collections     = 0xD8
+entities.buildings       = 0x190
+entities.observers       = 0x1C0
+entities.bots            = 0x318</pre>
+      </div>
+
+      <div class="block">
+        <div class="block-head"><span><i class="tag t-items">plot</i> base / plots <span class="cls">WorldEntitiesModel</span></span><button class="btn copy-code">copy</button></div>
+        <pre>plot.storages        = 0x128
+plot.storage_inv     = 0x130
+plot.container_inv   = 0x138
+plot.containers      = 0x140
+plot.shelvings       = 0x148
+plot.plots           = 0x150
+plot.cars            = 0x1D8
+plot.helicopters     = 0x1E0
+plot.vehicle_trunks  = 0x1E8
+plot.builder_slots   = 0x1F8
+plot.car_garages     = 0x200
+plot.heli_garages    = 0x208
+plot.location_doors  = 0x210
+plot.builder_doors   = 0x218
+plot.furniture_loots = 0x220
+plot.building_loots  = 0x238
+plot.defense_public  = 0x278
+plot.defense_private = 0x280
+plot.water_zones     = 0x288
+plot.loots           = 0x2F0
+plot.laundering      = 0x2F8</pre>
+      </div>
+
+      <div class="block">
+        <div class="block-head"><span><i class="tag t-data">econ</i> workbenches <span class="cls">WorldEntitiesModel</span></span><button class="btn copy-code">copy</button></div>
+        <pre>econ.open_bench       = 0xE0
+econ.open_slots       = 0xE8
+econ.exchange_bench   = 0xF0
+econ.exchange_slots   = 0xF8
+econ.money_benches    = 0x158
+econ.settlement       = 0x1C8
+econ.cash_loot_nodes  = 0x268
+econ.holding_cells    = 0x298
+econ.buyers           = 0x2A0
+econ.buyer_inv        = 0x2A8
+econ.cop_equip        = 0x2B0
+econ.cop_reward       = 0x2B8
+econ.production_bench = 0x2C0
+econ.production_slots = 0x2C8
+econ.charge_bench     = 0x2D0
+econ.crypto_public    = 0x2D8
+econ.crypto_private   = 0x2E0
+econ.architect        = 0x2E8
+econ.repositories     = 0x300
+econ.police_badges    = 0x308
+econ.roulette         = 0x478</pre>
       </div>
 
       <div class="block">
@@ -611,7 +667,10 @@ priv.cop_info         = 0x268
 priv.move_speed       = 0x2C8
 priv.camera           = 0x2D0
 priv.controller       = 0x2D8
+priv.leave_reason     = 0x2E0
 priv.stamina          = 0x2E8
+priv.stamina_damage   = 0x2F0
+priv.velocity_damage  = 0x2F8
 priv.detention_points = 0x300
 priv.damage_zone      = 0x308</pre>
       </div>
@@ -701,7 +760,7 @@ melee_hit      = 0x48</pre>
       instance offsets are relative to the managed object base, header included.
       struct entries add 0x10 for the boxed header. statics are relative to static storage.
       runtime generic layouts have no fixed offset — resolve the constructed type first.
-      full export: 216 headers, csv + json, on request.
+      full export: 23,047 types, csv + json, on request.
     </p>
   </section>
 
@@ -738,7 +797,7 @@ melee_hit      = 0x48</pre>
     <div><span class="dot"></span><b id="st-sec">home</b></div>
     <div class="mid">
       <span>rip <b id="st-addr">0x400000</b></span>
-      <span>build <b>2026-11-13</b></span>
+      <span>build <b>2026-11-19</b></span>
     </div>
     <div class="k"><em>1</em><em>2</em><em>3</em> jump</div>
   </div>
@@ -852,7 +911,9 @@ melee_hit      = 0x48</pre>
 
   document.querySelectorAll('.copy-code').forEach(b => b.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(b.closest('.block').querySelector('pre').innerText); } catch (e) {}
-    popToast('copied ' + b.previousElementSibling.textContent);
+    const head = b.previousElementSibling.cloneNode(true);
+    head.querySelector('.tag')?.remove();
+    popToast('copied ' + head.textContent.replace(/\s+/g, ' ').trim());
     flash(b);
   }));
 
